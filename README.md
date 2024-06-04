@@ -1,66 +1,92 @@
-## Foundry
+# Virgin League NFT Staking
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This repository contains the smart contracts used for the [Virgin League](https://www.virginleague.com/) NFT staking.
 
-Foundry consists of:
+## Requirements
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git): run `git --version` to check the existing installation
+- [Foundry](https://getfoundry.sh/): run `forge --version` to check the existing installation
 
-## Documentation
+## Setup
 
-https://book.getfoundry.sh/
+To clone the repository and install the dependencies, run:
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```
+git clone https://github.com/blocktivist/virgin-league-nft-staking
+cd virgin-league-nft-staking
+forge install
+forge build
 ```
 
-### Test
+## Tests
 
-```shell
-$ forge test
+To test `VirginLeagueStaking.sol`, run:
+
+```
+forge test
 ```
 
-### Format
+To test a single test function, run:
 
-```shell
-$ forge fmt
+```
+forge test --mt <testFunction> -vvvvv
 ```
 
-### Gas Snapshots
+- `testFunction`: the name of the test function without parentheses
 
-```shell
-$ forge snapshot
+To display the test coverage, run:
+
+```
+forge coverage
 ```
 
-### Anvil
+To display a gas snapshot, run:
 
-```shell
-$ anvil
+```
+forge snapshot
 ```
 
-### Deploy
+## Deployment
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+To add a `.env` file, run:
+
+```
+cp .env.example .env
+# add BASE_SEPOLIA_RPC_URL or BASE_RPC_URL
+# add BASESCAN_API_KEY
+source .env
 ```
 
-### Cast
+To add a private key, run:
 
-```shell
-$ cast <subcommand>
+```
+cast wallet import baseSepoliaKey --interactive
+# or
+cast wallet import baseKey --interactive
 ```
 
-### Help
+To deploy `VirginLeagueStaking`, set the `run()` function and the local variables in `DeployVirginLeagueStaking.s.sol`, and run:
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
 ```
+forge script script/DeployVirginLeagueStaking.s.sol --rpc-url $BASE_SEPOLIA_RPC_URL --account baseSepoliaKey --broadcast
+# or
+forge script script/DeployVirginLeagueStaking.s.sol --rpc-url $BASE_RPC_URL --account baseKey --broadcast
+```
+
+To verify a deployed `VirginLeagueStaking` instance, run:
+
+```
+forge verify-contract \
+--chain-id <chainId> \
+--num-of-optimizations 200 \
+--watch \
+--constructor-args $(cast abi-encode "constructor(address,uint256,string)" <constructorArgs>) \
+--etherscan-api-key $BASESCAN_API_KEY \
+--compiler-version v0.8.25+commit.b61c2a91 \
+<instanceAddress> \
+src/VirginLeagueStaking.sol:VirginLeagueStaking
+```
+
+- `chainId`: `84532` for Base Sepolia and `8453` for Base Mainnet
+- `constructorArgs`: the constructor arguments given the used settings in `DeployVirginLeagueStaking.s.sol` and separated by a single whitespace
+- `instanceAddress`: the address of the `VirginLeagueStaking` instance to verify
