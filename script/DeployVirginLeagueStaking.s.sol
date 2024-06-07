@@ -13,11 +13,13 @@ contract DeployVirginLeagueStaking is Script {
 
     function deployVirginLeagueStakingOnBaseSepolia() public returns (MockERC721A, VirginLeagueStaking) {
         uint256 pointsPerDay = 1;
+        uint256 multiplierPerTenDays = 25;
         string memory uri = "ipfs://bafybeicttntytjyvgco4s6q2qa2753243bo65vvqhbwjew7wxz7ccddwau/";
 
         vm.startBroadcast();
         MockERC721A mockERC721A = new MockERC721A();
-        VirginLeagueStaking virginLeagueStaking = new VirginLeagueStaking(address(mockERC721A), pointsPerDay, uri);
+        VirginLeagueStaking virginLeagueStaking =
+            new VirginLeagueStaking(address(mockERC721A), pointsPerDay, multiplierPerTenDays, uri);
         vm.stopBroadcast();
 
         return (mockERC721A, virginLeagueStaking);
@@ -26,10 +28,12 @@ contract DeployVirginLeagueStaking is Script {
     function deployVirginLeagueStakingOnBase() public returns (VirginLeagueStaking) {
         address virginLeagueContract = 0x338c686291C616797727518028905B526973F8a2;
         uint256 pointsPerDay = 1;
+        uint256 multiplierPerTenDays = 25;
         string memory uri = "ipfs://bafybeicttntytjyvgco4s6q2qa2753243bo65vvqhbwjew7wxz7ccddwau/";
 
         vm.startBroadcast();
-        VirginLeagueStaking virginLeagueStaking = new VirginLeagueStaking(virginLeagueContract, pointsPerDay, uri);
+        VirginLeagueStaking virginLeagueStaking =
+            new VirginLeagueStaking(virginLeagueContract, pointsPerDay, multiplierPerTenDays, uri);
         vm.stopBroadcast();
 
         return virginLeagueStaking;

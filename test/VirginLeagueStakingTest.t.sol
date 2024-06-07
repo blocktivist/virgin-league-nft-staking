@@ -268,7 +268,7 @@ contract VirginLeagueStakingTest is Test {
         mockERC721A.transferFrom(user, address(0), 0);
     }
 
-    function testClaimPoints() external {
+    function testClaimPointsAfter1000seconds() external {
         // Mint a token to the user
         vm.startPrank(user);
         mockERC721A.mint(user, 1);
@@ -283,7 +283,92 @@ contract VirginLeagueStakingTest is Test {
         vm.warp(block.timestamp + duration);
         virginLeagueStaking.unstake(token);
         // Check the points
-        uint256 expectedPoints = ((duration * 10 ** 4) * 1) / 1 days;
+        uint256 multiplier = (duration / 1 days) / 10 * 25;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (1 * 100 + multiplier)) / (1 days * 100);
+        console.log(expectedPoints);
+        assertEq(virginLeagueStaking.points(user), expectedPoints);
+    }
+
+    function testClaimPointsAfter10000seconds() external {
+        // Mint a token to the user
+        vm.startPrank(user);
+        mockERC721A.mint(user, 1);
+        // Approve the staking contract to transfer the token
+        mockERC721A.setApprovalForAll(address(virginLeagueStaking), true);
+        // Stake the token
+        uint256[] memory token = new uint256[](1);
+        token[0] = 0;
+        virginLeagueStaking.stake(token);
+        // Unstake the token
+        uint256 duration = 10000;
+        vm.warp(block.timestamp + duration);
+        virginLeagueStaking.unstake(token);
+        // Check the points
+        uint256 multiplier = (duration / 1 days) / 10 * 25;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (1 * 100 + multiplier)) / (1 days * 100);
+        console.log(expectedPoints);
+        assertEq(virginLeagueStaking.points(user), expectedPoints);
+    }
+
+    function testClaimPointsAfter100000seconds() external {
+        // Mint a token to the user
+        vm.startPrank(user);
+        mockERC721A.mint(user, 1);
+        // Approve the staking contract to transfer the token
+        mockERC721A.setApprovalForAll(address(virginLeagueStaking), true);
+        // Stake the token
+        uint256[] memory token = new uint256[](1);
+        token[0] = 0;
+        virginLeagueStaking.stake(token);
+        // Unstake the token
+        uint256 duration = 100000;
+        vm.warp(block.timestamp + duration);
+        virginLeagueStaking.unstake(token);
+        // Check the points
+        uint256 multiplier = (duration / 1 days) / 10 * 25;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (1 * 100 + multiplier)) / (1 days * 100);
+        console.log(expectedPoints);
+        assertEq(virginLeagueStaking.points(user), expectedPoints);
+    }
+
+    function testClaimPointsAfter1000000seconds() external {
+        // Mint a token to the user
+        vm.startPrank(user);
+        mockERC721A.mint(user, 1);
+        // Approve the staking contract to transfer the token
+        mockERC721A.setApprovalForAll(address(virginLeagueStaking), true);
+        // Stake the token
+        uint256[] memory token = new uint256[](1);
+        token[0] = 0;
+        virginLeagueStaking.stake(token);
+        // Unstake the token
+        uint256 duration = 1000000;
+        vm.warp(block.timestamp + duration);
+        virginLeagueStaking.unstake(token);
+        // Check the points
+        uint256 multiplier = (duration / 1 days) / 10 * 25;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (1 * 100 + multiplier)) / (1 days * 100);
+        console.log(expectedPoints);
+        assertEq(virginLeagueStaking.points(user), expectedPoints);
+    }
+
+    function testClaimPointsAfter3000000seconds() external {
+        // Mint a token to the user
+        vm.startPrank(user);
+        mockERC721A.mint(user, 1);
+        // Approve the staking contract to transfer the token
+        mockERC721A.setApprovalForAll(address(virginLeagueStaking), true);
+        // Stake the token
+        uint256[] memory token = new uint256[](1);
+        token[0] = 0;
+        virginLeagueStaking.stake(token);
+        // Unstake the token
+        uint256 duration = 3000000;
+        vm.warp(block.timestamp + duration);
+        virginLeagueStaking.unstake(token);
+        // Check the points
+        uint256 multiplier = (duration / 1 days) / 10 * 25;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (1 * 100 + multiplier)) / (1 days * 100);
         console.log(expectedPoints);
         assertEq(virginLeagueStaking.points(user), expectedPoints);
     }
@@ -306,7 +391,32 @@ contract VirginLeagueStakingTest is Test {
         vm.warp(block.timestamp + duration);
         virginLeagueStaking.unstake(token);
         // Check the points
-        uint256 expectedPoints = ((duration * 10 ** 4) * 2) / 1 days;
+        uint256 multiplier = (duration / 1 days) / 10 * 25;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (2 * 100 + multiplier)) / (1 days * 100);
+        console.log(expectedPoints);
+        assertEq(virginLeagueStaking.points(user), expectedPoints);
+    }
+
+    function testSetMultiplierPerTenDays() external {
+        // Set the multiplier per ten days to 50
+        vm.startPrank(virginLeagueStaking.owner());
+        virginLeagueStaking.setMultiplierPerTenDays(50);
+        // Mint a token to the user
+        vm.startPrank(user);
+        mockERC721A.mint(user, 1);
+        // Approve the staking contract to transfer the token
+        mockERC721A.setApprovalForAll(address(virginLeagueStaking), true);
+        // Stake the token
+        uint256[] memory token = new uint256[](1);
+        token[0] = 0;
+        virginLeagueStaking.stake(token);
+        // Unstake the token
+        uint256 duration = 1000;
+        vm.warp(block.timestamp + duration);
+        virginLeagueStaking.unstake(token);
+        // Check the points
+        uint256 multiplier = (duration / 1 days) / 10 * 50;
+        uint256 expectedPoints = ((duration * 10 ** 4) * (1 * 100 + multiplier)) / (1 days * 100);
         console.log(expectedPoints);
         assertEq(virginLeagueStaking.points(user), expectedPoints);
     }

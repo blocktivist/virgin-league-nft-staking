@@ -18,6 +18,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
 
     /// State variables ///
     uint256 public pointsPerDay;
+    uint256 public multiplierPerTenDays;
     string private _baseTokenURI;
 
     /// Mappings ///
@@ -32,13 +33,15 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
     /// Constructor ///
     /// @param _virginLeagueContract Address of the Virgin League NFT contract
     /// @param _pointsPerDay Points per day
+    /// @param _multiplierPerTenDays Point multiplier per ten days
     /// @param _uri Base URI
-    constructor(address _virginLeagueContract, uint256 _pointsPerDay, string memory _uri)
+    constructor(address _virginLeagueContract, uint256 _pointsPerDay, uint256 _multiplierPerTenDays, string memory _uri)
         ERC721("StakedVirgin", "STVL")
         Ownable(msg.sender)
     {
         virginLeagueContract = IERC721A(_virginLeagueContract);
         pointsPerDay = _pointsPerDay;
+        multiplierPerTenDays = _multiplierPerTenDays;
         _baseTokenURI = _uri;
     }
 
@@ -62,7 +65,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
     }
 
     /// @notice Unstakes multiple Virgin League NFTs and burns the corresponding VLST NFTs
-    /// @dev Can only be called when the contract is not paused
+    /// @dev Can be called even when the contract is paused
     /// @param _tokenIds Array of IDs of the Virgin League NFTs
     function unstake(uint256[] calldata _tokenIds) external {
         for (uint256 i = 0; i < _tokenIds.length; i++) {
@@ -115,6 +118,13 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
         pointsPerDay = _pointsPerDay;
     }
 
+    /// @notice Sets the point multiplier per ten days
+    /// @dev Can only be called by the owner
+    /// @param _multiplierPerTenDays Points per day
+    function setMultiplierPerTenDays(uint256 _multiplierPerTenDays) external onlyOwner {
+        multiplierPerTenDays = _multiplierPerTenDays;
+    }
+
     /// @notice Sets the base URI
     /// @dev Can only be called by the owner
     /// @param _uri Base URI
@@ -150,10 +160,14 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
     }
 
     /// @notice Calculates the points for a staked Virgin League NFT
-    /// @dev Points are returned in 4 decimal precision to prevent rounding errors
+    /// @dev `daysStaked` are rounded down to the nearest day
+    /// @dev `multiplier` is designed to increment every 10 days
     /// @param _duration Staking duration
+    /// @return calculatedPoints Points earned in 4 decimal precision
     function _calculatePoints(uint256 _duration) private view returns (uint256) {
-        uint256 calculatedPoints = ((_duration * 10 ** 4) * pointsPerDay) / 1 days;
+        uint256 daysStaked = _duration / 1 days;
+        uint256 multiplier = (daysStaked / 10) * multiplierPerTenDays;
+        uint256 calculatedPoints = ((_duration * 10 ** 4) * (pointsPerDay * 100 + multiplier)) / (1 days * 100);
 
         return calculatedPoints;
     }
