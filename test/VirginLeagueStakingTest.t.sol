@@ -4,6 +4,7 @@ pragma solidity 0.8.25;
 import {Test, console} from "forge-std/Test.sol";
 import {MockERC721A} from "../src/MockERC721A.sol";
 import {VirginLeagueStaking} from "../src/VirginLeagueStaking.sol";
+import {DeployVirginLeagueStaking} from "../script/DeployVirginLeagueStaking.s.sol";
 
 contract VirginLeagueStakingTest is Test {
     MockERC721A public mockERC721A;
@@ -13,8 +14,8 @@ contract VirginLeagueStakingTest is Test {
     address public attacker = address(2);
 
     function setUp() external {
-        mockERC721A = new MockERC721A();
-        virginLeagueStaking = new VirginLeagueStaking(address(mockERC721A), 1, "ipfs://example.com/");
+        DeployVirginLeagueStaking deployVirginLeagueStaking = new DeployVirginLeagueStaking();
+        (mockERC721A, virginLeagueStaking) = deployVirginLeagueStaking.deployVirginLeagueStakingOnBaseSepolia();
     }
 
     function testStakeSingleTokenWithApprove() external {
