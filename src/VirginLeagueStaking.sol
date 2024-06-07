@@ -120,7 +120,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
 
     /// @notice Sets the point multiplier per ten days
     /// @dev Can only be called by the owner
-    /// @param _multiplierPerTenDays Points per day
+    /// @param _multiplierPerTenDays Point multiplier per ten days
     function setMultiplierPerTenDays(uint256 _multiplierPerTenDays) external onlyOwner {
         multiplierPerTenDays = _multiplierPerTenDays;
     }
