@@ -46,7 +46,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
     }
 
     /// External functions ///
-    /// @notice Stakes multiple Virgin League NFTs and mints the corresponding VLST NFTs
+    /// @notice Stakes multiple Virgin League NFTs and mints the corresponding STVL NFTs
     /// @dev Can only be called when the contract is not paused
     /// @dev Requires approval from the Virgin League NFT contract for each tokenId
     /// @param _tokenIds Array of IDs of the Virgin League NFTs
@@ -64,7 +64,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
         }
     }
 
-    /// @notice Unstakes multiple Virgin League NFTs and burns the corresponding VLST NFTs
+    /// @notice Unstakes multiple Virgin League NFTs and burns the corresponding STVL NFTs
     /// @dev Can be called even when the contract is paused
     /// @param _tokenIds Array of IDs of the Virgin League NFTs
     function unstake(uint256[] calldata _tokenIds) external {
@@ -81,7 +81,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
         }
     }
 
-    /// @notice Unstakes multiple Virgin League NFTs and burns the corresponding VLST NFTs
+    /// @notice Unstakes multiple Virgin League NFTs and burns the corresponding STVL NFTs
     /// @dev Can only be called by the owner and when the contract is paused
     /// @param _tokenIds Array of IDs of the Virgin League NFTs to unstake
     function ownerUnstake(uint256[] calldata _tokenIds) external onlyOwner whenPaused {
@@ -133,7 +133,7 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
     }
 
     /// Internal functions ///
-    /// @notice Overrides the _update function to prevent transfers of the VLST token
+    /// @notice Overrides the _update function to prevent transfers of the STVL token
     /// @dev See {ERC721-_update}
     function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
         if (auth != address(0) && to != address(0)) revert NotTransferable();
