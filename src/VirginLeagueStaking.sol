@@ -2,12 +2,13 @@
 pragma solidity 0.8.25;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {IERC721A} from "erc721a/IERC721A.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title VirginLeagueStaking
-contract VirginLeagueStaking is ERC721, Ownable, Pausable {
+contract VirginLeagueStaking is ERC721, ERC721Enumerable, Pausable, Ownable {
     /// Custom errors ///
     error NotTheOwner();
     error NotTheStaker();
@@ -132,13 +133,43 @@ contract VirginLeagueStaking is ERC721, Ownable, Pausable {
         _baseTokenURI = _uri;
     }
 
+    /// @notice Returns an array of token IDs owned by an STVL owner
+    /// @param owner Address of the STVL owner
+    /// @return tokenIds Array of token IDs
+    function tokensOfOwner(address owner) external view returns (uint256[] memory) {
+        uint256 tokenCount = balanceOf(owner);
+        uint256[] memory tokenIds = new uint256[](tokenCount);
+        for (uint256 i = 0; i < tokenCount; i++) {
+            tokenIds[i] = tokenOfOwnerByIndex(owner, i);
+        }
+
+        return tokenIds;
+    }
+
+    /// Public functions ///
+    /// @notice Overrides the supportsInterface function
+    /// @dev See {ERC721-supportsInterface}
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+
     /// Internal functions ///
     /// @notice Overrides the _update function to prevent transfers of the STVL token
     /// @dev See {ERC721-_update}
-    function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721, ERC721Enumerable)
+        returns (address)
+    {
         if (auth != address(0) && to != address(0)) revert NotTransferable();
 
         return super._update(to, tokenId, auth);
+    }
+
+    /// @notice Overrides the _increaseBalance function
+    /// @dev See {ERC721-_increaseBalance}
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable) {
+        super._increaseBalance(account, value);
     }
 
     /// @notice Overrides the _baseURI function
